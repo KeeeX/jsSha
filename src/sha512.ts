@@ -204,7 +204,7 @@ function finalizeSHA512(
   remainderBinLen: number,
   processedBinLen: number,
   H: Int_64[],
-  variant: VariantType
+  variant: VariantType,
 ): number[] {
   let i, retVal;
 
@@ -236,7 +236,7 @@ function finalizeSHA512(
   }
 
   if ("SHA-384" === variant) {
-    H = (H as unknown) as Int_64[];
+    H = H as unknown as Int_64[];
     retVal = [
       H[0].highOrder,
       H[0].lowOrder,
@@ -275,7 +275,7 @@ function finalizeSHA512(
   return retVal;
 }
 
-export default class jsSHA extends jsSHABase<Int_64[], VariantType> {
+export class jsSHA512 extends jsSHABase<Int_64[], VariantType> {
   intermediateState: Int_64[];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;

@@ -144,7 +144,7 @@ declare abstract class jsSHABase<StateT, VariantT> {
 }
 
 type VariantType = "SHA-224" | "SHA-256";
-declare class jsSHA extends jsSHABase<number[], VariantType> {
+declare class jsSHA256 extends jsSHABase<number[], VariantType> {
     intermediateState: number[];
     variantBlockSize: number;
     bigEndianMod: -1 | 1;
@@ -161,4 +161,4 @@ declare class jsSHA extends jsSHABase<number[], VariantType> {
     constructor(variant: VariantType, inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
 }
 
-export { jsSHA as default };
+export { jsSHA256 };

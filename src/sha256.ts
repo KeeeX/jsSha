@@ -104,7 +104,7 @@ function finalizeSHA256(
   remainderBinLen: number,
   processedBinLen: number,
   H: number[],
-  variant: VariantType
+  variant: VariantType,
 ): number[] {
   let i, retVal;
 
@@ -144,7 +144,7 @@ function finalizeSHA256(
 
   return retVal;
 }
-export default class jsSHA extends jsSHABase<number[], VariantType> {
+export class jsSHA256 extends jsSHABase<number[], VariantType> {
   intermediateState: number[];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;

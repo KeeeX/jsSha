@@ -111,7 +111,7 @@ function finalizeSHA1(remainder: number[], remainderBinLen: number, processedBin
   return H;
 }
 
-export default class jsSHA extends jsSHABase<number[], "SHA-1"> {
+export class jsSHA1 extends jsSHABase<number[], "SHA-1"> {
   intermediateState: number[];
   variantBlockSize: number;
   bigEndianMod: -1 | 1;

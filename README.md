@@ -40,10 +40,10 @@ const jsSHA = require("jssha");
 /* The limited variant files are also exported (sha1, sha256, sha512, and sha3)
  * using conditional subpath exports in Node.js v13+ or using --experimental-modules
  * in v12 */
-const jsSHA1 = require("jssha/sha1");
+const { jsSHA1 } = require("jssha/sha1");
 /* For Node.js versions that don't support subpath exports, you can do the
  * following instead: */
-const jsSHA1 = require("jssha/dist/sha1");
+const { jsSHA1 } = require("jssha/dist/sha1");
 /* Alternatively, you can load it as an ESM (Node.js v13+ or using
  * --experimental-modules in v12) */
 import jsSHA from "jssha";

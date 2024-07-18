@@ -77,13 +77,13 @@ describe("Test finalizeSHA256", () => {
 });
 
 describe("Test jsSHA(SHA-256)", () => {
-  const jsSHA = sha256.__get__("jsSHA");
+  const jsSHA = sha256.__get__("jsSHA256");
   class jsSHAATest extends jsSHA {
     constructor(variant: "SHA-224" | "SHA-256", inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
     constructor(
       variant: "SHA-224" | "SHA-256",
       inputFormat: FormatNoTextType,
-      options?: FixedLengthOptionsNoEncodingType
+      options?: FixedLengthOptionsNoEncodingType,
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(variant: any, inputFormat: any, options?: any) {
@@ -143,7 +143,7 @@ describe("Test jsSHA(SHA-256)", () => {
 
           hash.getter("finalizeFunc")([0xdeadbeef], 32, 0, [0xfacefeed]);
           assert.isTrue(finalizeFuncSpy.lastCall.calledWithExactly([0xdeadbeef], 32, 0, [0xfacefeed], test.variant));
-        }
+        },
       );
     });
   });
@@ -167,5 +167,5 @@ describe("Test jsSHA(SHA-256)", () => {
   });
 });
 
-runHashTests("SHA-224", sha256.__get__("jsSHA"));
-runHashTests("SHA-256", sha256.__get__("jsSHA"));
+runHashTests("SHA-224", sha256.__get__("jsSHA256"));
+runHashTests("SHA-256", sha256.__get__("jsSHA256"));

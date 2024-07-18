@@ -11,10 +11,10 @@ import {
   KMACOptionsNoEncodingType,
   KMACOptionsEncodingType,
 } from "./custom_types";
-import jsSHA1 from "./sha1";
-import jsSHA256 from "./sha256";
-import jsSHA512 from "./sha512";
-import jsSHA3 from "./sha3";
+import { jsSHA1 } from "./sha1";
+import { jsSHA256 } from "./sha256";
+import { jsSHA512 } from "./sha512";
+import { jsSHA3 } from "./sha3";
 
 type FixedLengthVariantType =
   | "SHA-1"
@@ -50,7 +50,7 @@ export default class jsSHA {
   constructor(
     variant: FixedLengthVariantType,
     inputFormat: FormatNoTextType,
-    options?: FixedLengthOptionsNoEncodingType
+    options?: FixedLengthOptionsNoEncodingType,
   );
   constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: "TEXT", options?: SHAKEOptionsEncodingType);
   constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: FormatNoTextType, options?: SHAKEOptionsNoEncodingType);

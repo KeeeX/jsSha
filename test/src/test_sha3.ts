@@ -195,7 +195,7 @@ describe("Test resolveKMACOptions", () => {
         funcName: { value: [0x43414d4b], binLen: 32 },
         customization: { value: [0x33221100], binLen: 32 },
         kmacKey: { value: [0x77665544], binLen: 32 },
-      }
+      },
     );
   });
 
@@ -209,7 +209,7 @@ describe("Test resolveKMACOptions", () => {
         funcName: { value: [0x43414d4b], binLen: 32 },
         customization: { value: [], binLen: 0 },
         kmacKey: { value: [0x77665544], binLen: 32 },
-      }
+      },
     );
   });
 });
@@ -255,9 +255,9 @@ describe("Test finalizeSHA3", () => {
           getNewState(),
           1152,
           0x06,
-          224
+          224,
         ),
-        [0x6a817693, 0x723f50ba, 0xebe76cf9, 0x5d09ac65, 0x4bbee3ee, 0xa1c2bbf9, 0xe0117ecb]
+        [0x6a817693, 0x723f50ba, 0xebe76cf9, 0x5d09ac65, 0x4bbee3ee, 0xa1c2bbf9, 0xe0117ecb],
       );
     });
   });
@@ -272,27 +272,27 @@ describe("Test finalizeSHA3", () => {
         getNewState(),
         1344,
         0x1f,
-        2048
+        2048,
       ),
-      SHAKE128Len2048Out
+      SHAKE128Len2048Out,
     );
   });
 });
 
 describe("Test jsSHA(SHA3)", () => {
-  const jsSHA = sha3.__get__("jsSHA");
+  const jsSHA = sha3.__get__("jsSHA3");
   class jsSHAATest extends jsSHA {
     constructor(variant: VariantNoCSHAKEType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
     constructor(
       variant: VariantNoCSHAKEType,
       inputFormat: FormatNoTextType,
-      options?: FixedLengthOptionsNoEncodingType
+      options?: FixedLengthOptionsNoEncodingType,
     );
     constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: "TEXT", options?: CSHAKEOptionsEncodingType);
     constructor(
       variant: "CSHAKE128" | "CSHAKE256",
       inputFormat: FormatNoTextType,
-      options?: CSHAKEOptionsNoEncodingType
+      options?: CSHAKEOptionsNoEncodingType,
     );
     constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);
     constructor(variant: "KMAC128" | "KMAC256", inputFormat: FormatNoTextType, options: KMACOptionsNoEncodingType);
@@ -472,8 +472,8 @@ describe("Test jsSHA(SHA3)", () => {
             [[0xfacefeed]],
             test.variantBlockSize,
             test.delimiter,
-            test.outputBinLen
-          )
+            test.outputBinLen,
+          ),
         );
       });
     });
@@ -533,14 +533,14 @@ describe("Test jsSHA(SHA3)", () => {
   it("CSHAKE Without Customization Value", () => {
     assert.throws(
       () => new jsSHA("CSHAKE128", "HEX", { customization: { format: "TEXT" } }),
-      "Customization must include a value and format"
+      "Customization must include a value and format",
     );
   });
 
   it("CSHAKE Without Customization Format", () => {
     assert.throws(
       () => new jsSHA("CSHAKE128", "HEX", { customization: { value: "abc" } }),
-      "Customization must include a value and format"
+      "Customization must include a value and format",
     );
   });
 
@@ -548,7 +548,7 @@ describe("Test jsSHA(SHA3)", () => {
     assert.throws(
       () =>
         new jsSHA("CSHAKE128", "HEX", { customization: { value: "abc", format: "TEXT" }, funcName: { value: "A" } }),
-      "funcName must include a value and format"
+      "funcName must include a value and format",
     );
   });
 
@@ -559,14 +559,14 @@ describe("Test jsSHA(SHA3)", () => {
           customization: { value: "abc", format: "TEXT" },
           funcName: { format: "TEXT" },
         }),
-      "funcName must include a value and format"
+      "funcName must include a value and format",
     );
   });
 
   it("KMAC128 With numRounds", () => {
     assert.throws(
       () => new jsSHA("KMAC128", "HEX", { numRounds: 2, kmacKey: { value: "TEST", format: "TEXT" } }),
-      "Cannot set numRounds with MAC"
+      "Cannot set numRounds with MAC",
     );
   });
 
@@ -577,14 +577,14 @@ describe("Test jsSHA(SHA3)", () => {
   it("KMAC128 With kmacKey Missing Value", () => {
     assert.throws(
       () => new jsSHA("KMAC128", "HEX", { kmacKey: { format: "HEX" } }),
-      "kmacKey must include a value and format"
+      "kmacKey must include a value and format",
     );
   });
 
   it("KMAC128 With kmacKey Missing Format", () => {
     assert.throws(
       () => new jsSHA("KMAC128", "HEX", { kmacKey: { value: "AA" } }),
-      "kmacKey must include a value and format"
+      "kmacKey must include a value and format",
     );
   });
 
@@ -601,13 +601,13 @@ describe("Test jsSHA(SHA3)", () => {
   });
 });
 
-runHashTests("SHA3-224", sha3.__get__("jsSHA"));
-runHashTests("SHA3-256", sha3.__get__("jsSHA"));
-runHashTests("SHA3-384", sha3.__get__("jsSHA"));
-runHashTests("SHA3-512", sha3.__get__("jsSHA"));
-runHashTests("SHAKE128", sha3.__get__("jsSHA"));
-runHashTests("SHAKE256", sha3.__get__("jsSHA"));
-runHashTests("CSHAKE128", sha3.__get__("jsSHA"));
-runHashTests("CSHAKE256", sha3.__get__("jsSHA"));
-runHashTests("KMAC128", sha3.__get__("jsSHA"));
-runHashTests("KMAC256", sha3.__get__("jsSHA"));
+runHashTests("SHA3-224", sha3.__get__("jsSHA3"));
+runHashTests("SHA3-256", sha3.__get__("jsSHA3"));
+runHashTests("SHA3-384", sha3.__get__("jsSHA3"));
+runHashTests("SHA3-512", sha3.__get__("jsSHA3"));
+runHashTests("SHAKE128", sha3.__get__("jsSHA3"));
+runHashTests("SHAKE256", sha3.__get__("jsSHA3"));
+runHashTests("CSHAKE128", sha3.__get__("jsSHA3"));
+runHashTests("CSHAKE256", sha3.__get__("jsSHA3"));
+runHashTests("KMAC128", sha3.__get__("jsSHA3"));
+runHashTests("KMAC256", sha3.__get__("jsSHA3"));

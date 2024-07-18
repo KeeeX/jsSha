@@ -47,7 +47,7 @@ describe("Test finalizeSHA1", () => {
 });
 
 describe("Test jsSHA(SHA-1)", () => {
-  const jsSHA = sha1.__get__("jsSHA");
+  const jsSHA = sha1.__get__("jsSHA1");
 
   class jsSHAATest extends jsSHA {
     constructor(variant: "SHA-1", inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
@@ -125,4 +125,4 @@ describe("Test jsSHA(SHA-1)", () => {
   });
 });
 
-runHashTests("SHA-1", sha1.__get__("jsSHA"));
+runHashTests("SHA-1", sha1.__get__("jsSHA1"));
