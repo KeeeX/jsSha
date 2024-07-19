@@ -1,4 +1,4 @@
-import { jsSHABase, packedLEConcat, sha_variant_error, mac_rounds_error, TWO_PWR_32, parseInputOption } from "./common";
+import { jsSHABase, packedLEConcat, sha_variant_error, mac_rounds_error, TWO_PWR_32, parseInputOption } from "./common.js";
 import {
   packedValue,
   CSHAKEOptionsNoEncodingType,
@@ -12,9 +12,9 @@ import {
   FormatNoTextType,
   ResolvedCSHAKEOptionsNoEncodingType,
   ResolvedKMACOptionsNoEncodingType,
-} from "./custom_types";
-import { getStrConverter } from "./converters";
-import { Int_64, rotl_64, xor_64_2, xor_64_5 } from "./primitives_64";
+} from "./custom_types.js";
+import { getStrConverter } from "./converters.js";
+import { Int_64, rotl_64, xor_64_2, xor_64_5 } from "./primitives_64.js";
 
 type FixedLengthVariantType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
 
@@ -61,7 +61,7 @@ const r_sha3 = [
  * @param _variant Unused for this family.
  * @returns The initial state values.
  */
-function getNewState(_variant: VariantType): Int_64[][] {
+export function getNewState(_variant: VariantType): Int_64[][] {
   let i;
   const retVal = [];
 
@@ -78,7 +78,7 @@ function getNewState(_variant: VariantType): Int_64[][] {
  * @param state The state to be cloned.
  * @returns The cloned state.
  */
-function cloneSHA3State(state: Int_64[][]): Int_64[][] {
+export function cloneSHA3State(state: Int_64[][]): Int_64[][] {
   let i;
   const clone = [];
   for (i = 0; i < 5; i += 1) {
@@ -95,7 +95,7 @@ function cloneSHA3State(state: Int_64[][]): Int_64[][] {
  * @param state Hash state from a previous round.
  * @returns The resulting state value.
  */
-function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
+export function roundSHA3(block: number[] | null, state: Int_64[][]): Int_64[][] {
   let round, x, y, B;
   const C = [],
     D = [];
@@ -228,7 +228,7 @@ function finalizeSHA3(
  * @param x 32-bit number to to encode.
  * @returns The NIST specified output of the function.
  */
-function left_encode(x: number): packedValue {
+export function left_encode(x: number): packedValue {
   let byteOffset,
     byte,
     numEncodedBytes = 0;
@@ -259,7 +259,7 @@ function left_encode(x: number): packedValue {
  * @param x 32-bit number to to encode.
  * @returns The NIST specified output of the function.
  */
-function right_encode(x: number): packedValue {
+export function right_encode(x: number): packedValue {
   let byteOffset,
     byte,
     numEncodedBytes = 0;
@@ -290,7 +290,7 @@ function right_encode(x: number): packedValue {
  * @param input Packed array of integers.
  * @returns NIST encode_string output.
  */
-function encode_string(input: packedValue): packedValue {
+export function encode_string(input: packedValue): packedValue {
   return packedLEConcat(left_encode(input["binLen"]), input);
 }
 
@@ -301,7 +301,7 @@ function encode_string(input: packedValue): packedValue {
  * @param outputByteLen Desired length of the output in bytes, assumed to be a multiple of 4.
  * @returns NIST byte_pad output.
  */
-function byte_pad(packed: packedValue, outputByteLen: number): number[] {
+export function byte_pad(packed: packedValue, outputByteLen: number): number[] {
   let encodedLen = left_encode(outputByteLen),
     i;
 
@@ -321,7 +321,7 @@ function byte_pad(packed: packedValue, outputByteLen: number): number[] {
  *
  * @param options Option given to constructor
  */
-function resolveCSHAKEOptions(options: CSHAKEOptionsNoEncodingType): ResolvedCSHAKEOptionsNoEncodingType {
+export function resolveCSHAKEOptions(options: CSHAKEOptionsNoEncodingType): ResolvedCSHAKEOptionsNoEncodingType {
   const resolvedOptions = options || {};
 
   return {
@@ -335,7 +335,7 @@ function resolveCSHAKEOptions(options: CSHAKEOptionsNoEncodingType): ResolvedCSH
  *
  * @param options Option given to constructor
  */
-function resolveKMACOptions(options: KMACOptionsNoEncodingType): ResolvedKMACOptionsNoEncodingType {
+export function resolveKMACOptions(options: KMACOptionsNoEncodingType): ResolvedKMACOptionsNoEncodingType {
   const resolvedOptions = options || {};
 
   return {

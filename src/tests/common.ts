@@ -1,6 +1,6 @@
 import { describe, it } from "mocha";
 import { assert } from "chai";
-import hashData from "../hash_data.js";
+import { hash_data } from "./data/hash_data.js";
 
 export function runHashTests(
   variant:
@@ -23,7 +23,7 @@ export function runHashTests(
   jsSHA: any
 ): void {
   describe(`Test jsSHA(${variant}) Using NIST Tests`, () => {
-    hashData[variant].forEach((test) => {
+    hash_data[variant].forEach((test) => {
       test.outputs.forEach((output) => {
         if (test.hmacKey) {
           it(test.name + " - Old Style", () => {

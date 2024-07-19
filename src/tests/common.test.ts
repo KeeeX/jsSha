@@ -1,13 +1,13 @@
 import { describe, it } from "mocha";
 import sinon from "sinon";
 import { assert } from "chai";
-import { getOutputOpts, parseInputOption, packedLEConcat, jsSHABase } from "../../src/common";
+import { getOutputOpts, parseInputOption, packedLEConcat, jsSHABase } from "../common.js";
 import {
   FixedLengthOptionsEncodingType,
   FixedLengthOptionsNoEncodingType,
   FormatNoTextType,
   packedValue,
-} from "../../src/custom_types";
+} from "../custom_types.js";
 
 describe("Test packedLEConcat", () => {
   it("For 2 0-byte Values", () => {

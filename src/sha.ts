@@ -1,4 +1,4 @@
-import { sha_variant_error } from "./common";
+import { sha_variant_error } from "./common.js";
 import {
   CSHAKEOptionsEncodingType,
   CSHAKEOptionsNoEncodingType,
@@ -10,11 +10,11 @@ import {
   FormatNoTextType,
   KMACOptionsNoEncodingType,
   KMACOptionsEncodingType,
-} from "./custom_types";
-import { jsSHA1 } from "./sha1";
-import { jsSHA256 } from "./sha256";
-import { jsSHA512 } from "./sha512";
-import { jsSHA3 } from "./sha3";
+} from "./custom_types.js";
+import { jsSHA1 } from "./sha1.js";
+import { jsSHA256 } from "./sha256.js";
+import { jsSHA512 } from "./sha512.js";
+import { jsSHA3 } from "./sha3.js";
 
 type FixedLengthVariantType =
   | "SHA-1"

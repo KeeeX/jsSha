@@ -1,11 +1,11 @@
-import { jsSHABase, TWO_PWR_32, H_full, H_trunc, K_sha2, sha_variant_error, parseInputOption } from "./common";
+import { jsSHABase, TWO_PWR_32, H_full, H_trunc, K_sha2, sha_variant_error, parseInputOption } from "./common.js";
 import {
   packedValue,
   FixedLengthOptionsEncodingType,
   FixedLengthOptionsNoEncodingType,
   FormatNoTextType,
-} from "./custom_types";
-import { getStrConverter } from "./converters";
+} from "./custom_types.js";
+import { getStrConverter } from "./converters.js";
 import {
   ch_32,
   gamma0_32,
@@ -16,7 +16,7 @@ import {
   safeAdd_32_5,
   sigma0_32,
   sigma1_32,
-} from "./primitives_32";
+} from "./primitives_32.js";
 
 type VariantType = "SHA-224" | "SHA-256";
 
@@ -26,7 +26,7 @@ type VariantType = "SHA-224" | "SHA-256";
  * @param variant: The SHA-256 family variant.
  * @returns The initial state values.
  */
-function getNewState256(variant: VariantType): number[] {
+export function getNewState256(variant: VariantType): number[] {
   let retVal;
 
   if ("SHA-224" == variant) {
@@ -45,7 +45,7 @@ function getNewState256(variant: VariantType): number[] {
  * @param H The intermediate H values from a previous round.
  * @returns The resulting H values.
  */
-function roundSHA256(block: number[], H: number[]): number[] {
+export function roundSHA256(block: number[], H: number[]): number[] {
   let a, b, c, d, e, f, g, h, T1, T2, t;
 
   const W: number[] = [];

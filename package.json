@@ -2,60 +2,10 @@
   "name": "jssha",
   "version": "3.3.1",
   "description": "jsSHA implements the complete Secure Hash Standard (SHA) family (SHA-1, SHA-224/256/384/512, SHA3-224/256/384/512, SHAKE128/256, cSHAKE128/256, and KMAC128/256) with HMAC",
-  "main": "./dist/sha.js",
-  "exports": {
-    ".": {
-      "types": "./dist/sha.d.ts",
-      "import": "./dist/sha.mjs",
-      "require": "./dist/sha.js"
-    },
-    "./sha1": {
-      "types": "./dist/sha1.d.ts",
-      "import": "./dist/sha1.mjs",
-      "require": "./dist/sha1.js"
-    },
-    "./dist/sha1": {
-      "types": "./dist/sha1.d.ts",
-      "import": "./dist/sha1.mjs",
-      "require": "./dist/sha1.js"
-    },
-    "./sha256": {
-      "types": "./dist/sha256.d.ts",
-      "import": "./dist/sha256.mjs",
-      "require": "./dist/sha256.js"
-    },
-    "./dist/sha256": {
-      "types": "./dist/sha256.d.ts",
-      "import": "./dist/sha256.mjs",
-      "require": "./dist/sha256.js"
-    },
-    "./sha512": {
-      "types": "./dist/sha512.d.ts",
-      "import": "./dist/sha512.mjs",
-      "require": "./dist/sha512.js"
-    },
-    "./dist/sha512": {
-      "types": "./dist/sha512.d.ts",
-      "import": "./dist/sha512.mjs",
-      "require": "./dist/sha512.js"
-    },
-    "./sha3": {
-      "types": "./dist/sha3.d.ts",
-      "import": "./dist/sha3.mjs",
-      "require": "./dist/sha3.js"
-    },
-    "./dist/sha3": {
-      "types": "./dist/sha3.d.ts",
-      "import": "./dist/sha3.mjs",
-      "require": "./dist/sha3.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "module": "./dist/sha.mjs",
-  "types": "./dist/sha.d.ts",
+  "main": "./lib/sha.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Caligatio/jsSHA.git"
+    "url": "https://github.com/KeeeX/jsSha.git"
   },
   "keywords": [
     "SHA-1",
@@ -97,85 +47,55 @@
   ],
   "license": "BSD-3-Clause",
   "author": "Brian Turek <brian.turek@gmail.com>",
-  "bugs": {
-    "url": "https://github.com/Caligatio/jsSHA/issues"
-  },
   "engines": {
-    "node": "*"
+    "node": ">14"
   },
-  "homepage": "https://github.com/Caligatio/jsSHA",
+  "homepage": "https://keeex.me/oss",
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.3",
-    "@rollup/plugin-typescript": "^11.1.2",
+    "@babel/cli": "^7.24.8",
+    "@babel/preset-env": "^7.24.8",
+    "@keeex/eslint-config": "^1.12.5",
+    "@keeex/tslib": "^1.21.3",
+    "@swc/core": "^1.7.0",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/rewire": "^2.5.28",
     "@types/sinon": "^10.0.16",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
+    "babel-plugin-import-redirect": "^1.1.1",
+    "c8": "^10.1.2",
     "chai": "^4.3.7",
     "eslint": "^8.46.0",
-    "husky": "^8.0.3",
-    "karma": "^6.4.2",
-    "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^3.2.0",
-    "karma-firefox-launcher": "^2.1.2",
-    "karma-mocha": "^2.0.1",
-    "lint-staged": "^13.2.3",
+    "eslint-plugin-deprecation": "^3.0.0",
+    "eslint-plugin-i": "^2.29.1",
+    "eslint-plugin-mocha": "^10.4.3",
+    "eslint-plugin-promise": "^6.4.0",
+    "eslint-plugin-tsdoc": "^0.3.0",
+    "knip": "^5.26.0",
     "mocha": "^10.2.0",
-    "nyc": "^15.1.0",
-    "prettier": "^3.0.1",
     "rewire": "^6.0.0",
-    "rollup": "^3.27.2",
-    "rollup-plugin-dts": "^5.3.1",
-    "sinon": "^15.2.0",
     "ts-node": "^10.9.1",
-    "tslib": "^2.6.1",
-    "typescript": "<5.5"
+    "typescript": "^5.5.3"
   },
   "scripts": {
-    "build": "rollup -c",
-    "test": "nyc --reporter=html --reporter=text mocha test/src/*.ts",
-    "test_dist": "mocha test/dist/ && karma start karma.conf.js --file-variant sha && karma start karma.conf.js --file-variant sha1 && karma start karma.conf.js --file-variant sha256 && karma start karma.conf.js --file-variant sha512 && karma start karma.conf.js --file-variant sha3",
-    "prepare": "husky install"
+    "build": "tslib build",
+    "clean": "tslib clean",
+    "prepack": "npm run clean && npm run build",
+    "test": "tslib test"
   },
-  "mocha": {
-    "require": [
-      "ts-node/register"
-    ],
-    "timeout": 10000
+  "tslib": {
+    "buildWeb": true,
+    "knip": {
+      "entry": [
+        "sha.ts",
+        "sha1.ts",
+        "sha256.ts",
+        "sha512.ts",
+        "sha3.ts"
+      ]
+    },
+    "typedoc": false
   },
-  "nyc": {
-    "require": [
-      "ts-node/register"
-    ],
-    "exclude": [
-      "dist",
-      "*.js",
-      "coverage",
-      "test",
-      "rollup.config.mjs"
-    ],
-    "reporter": [
-      "text",
-      "html"
-    ],
-    "all": true
-  },
-  "prettier": {
-    "printWidth": 120,
-    "proseWrap": "always",
-    "overrides": [
-      {
-        "files": "*.md",
-        "options": {
-          "printWidth": 80
-        }
-      }
-    ]
-  },
-  "lint-staged": {
-    "*.{js,ts}": "eslint --cache --fix",
-    "*.{js,ts,css,md,html,json}": "prettier --write"
-  }
+  "type": "module"
 }

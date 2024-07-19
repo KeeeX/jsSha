@@ -25,7 +25,7 @@ export function rotl_32(x: number, n: number): number {
  * @param n The number of bits to shift.
  * @returns `x` shifted right circularly by `n` bits
  */
-function rotr_32(x: number, n: number): number {
+export function rotr_32(x: number, n: number): number {
   return (x >>> n) | (x << (32 - n));
 }
 
@@ -36,7 +36,7 @@ function rotr_32(x: number, n: number): number {
  * @param n The number of bits to shift.
  * @returns `x` shifted by `n` bits.
  */
-function shr_32(x: number, n: number): number {
+export function shr_32(x: number, n: number): number {
   return x >>> n;
 }
 

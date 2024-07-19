@@ -1,11 +1,11 @@
-import { jsSHABase, TWO_PWR_32, H_trunc, H_full, K_sha2, sha_variant_error, parseInputOption } from "./common";
+import { jsSHABase, TWO_PWR_32, H_trunc, H_full, K_sha2, sha_variant_error, parseInputOption } from "./common.js";
 import {
   packedValue,
   FixedLengthOptionsEncodingType,
   FixedLengthOptionsNoEncodingType,
   FormatNoTextType,
-} from "./custom_types";
-import { getStrConverter } from "./converters";
+} from "./custom_types.js";
+import { getStrConverter } from "./converters.js";
 import {
   ch_64,
   gamma0_64,
@@ -17,7 +17,7 @@ import {
   safeAdd_64_5,
   sigma0_64,
   sigma1_64,
-} from "./primitives_64";
+} from "./primitives_64.js";
 
 type VariantType = "SHA-384" | "SHA-512";
 
@@ -110,7 +110,7 @@ const K_sha512 = [
  * @param variant: The SHA-512 family variant.
  * @returns The initial state values.
  */
-function getNewState512(variant: VariantType): Int_64[] {
+export function getNewState512(variant: VariantType): Int_64[] {
   if ("SHA-384" === variant) {
     return [
       new Int_64(0xcbbb9d5d, H_trunc[0]),
@@ -144,7 +144,7 @@ function getNewState512(variant: VariantType): Int_64[] {
  * @param H The intermediate H values from a previous round.
  * @returns The resulting H values.
  */
-function roundSHA512(block: number[], H: Int_64[]): Int_64[] {
+export function roundSHA512(block: number[], H: Int_64[]): Int_64[] {
   let a, b, c, d, e, f, g, h, T1, T2, t, offset;
 
   const W: Int_64[] = [];

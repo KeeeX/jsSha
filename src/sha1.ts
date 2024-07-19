@@ -1,12 +1,12 @@
-import { jsSHABase, TWO_PWR_32, sha_variant_error, parseInputOption } from "./common";
+import { jsSHABase, TWO_PWR_32, sha_variant_error, parseInputOption } from "./common.js";
 import {
   packedValue,
   FixedLengthOptionsEncodingType,
   FixedLengthOptionsNoEncodingType,
   FormatNoTextType,
-} from "./custom_types";
-import { getStrConverter } from "./converters";
-import { ch_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_5 } from "./primitives_32";
+} from "./custom_types.js";
+import { getStrConverter } from "./converters.js";
+import { ch_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_5 } from "./primitives_32.js";
 
 /**
  * Gets the state values for the specified SHA variant.
@@ -14,7 +14,7 @@ import { ch_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_5 } from ".
  * @param _variant: Unused
  * @returns The initial state values.
  */
-function getNewState(_variant: "SHA-1"): number[] {
+export function getNewState(_variant: "SHA-1"): number[] {
   return [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
 }
 
@@ -25,7 +25,7 @@ function getNewState(_variant: "SHA-1"): number[] {
  * @param H The intermediate H values from a previous round.
  * @returns The resulting H values.
  */
-function roundSHA1(block: number[], H: number[]): number[] {
+export function roundSHA1(block: number[], H: number[]): number[] {
   let a, b, c, d, e, T, t;
   const W: number[] = [];
 
@@ -77,7 +77,7 @@ function roundSHA1(block: number[], H: number[]): number[] {
  * @param H The intermediate H values from a previous round.
  * @returns The array of integers representing the SHA-1 hash of message.
  */
-function finalizeSHA1(remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]): number[] {
+export function finalizeSHA1(remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]): number[] {
   let i;
 
   /* The 65 addition is a hack but it works.  The correct number is

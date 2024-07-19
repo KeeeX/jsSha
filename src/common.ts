@@ -1,4 +1,4 @@
-import { getStrConverter, getOutputConverter } from "./converters";
+import { getStrConverter, getOutputConverter } from "./converters.js";
 
 import {
   FormatType,
@@ -8,7 +8,7 @@ import {
   FormatNoTextType,
   packedValue,
   GenericInputType,
-} from "./custom_types";
+} from "./custom_types.js";
 
 export const TWO_PWR_32 = 4294967296;
 

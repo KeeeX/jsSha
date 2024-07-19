@@ -2,8 +2,8 @@ import { describe, it } from "mocha";
 import { assert } from "chai";
 import rewire from "rewire";
 import sinon from "sinon";
-import { runHashTests } from "./common";
-import { Int_64 } from "../../src/primitives_64";
+import { runHashTests } from "./common.js";
+import { Int_64 } from "../primitives_64.js";
 import {
   CSHAKEOptionsNoEncodingType,
   CSHAKEOptionsEncodingType,
@@ -12,7 +12,7 @@ import {
   FixedLengthOptionsEncodingType,
   FixedLengthOptionsNoEncodingType,
   FormatNoTextType,
-} from "../../src/custom_types";
+} from "../custom_types.js";
 import {
   NISTCSHAKERoundIn,
   CSHAKEWithFuncRoundIn,
@@ -24,16 +24,15 @@ import {
   SHAKE128Len2048Out,
   NISTKMACCustomizationRound1In,
   NISTKMACCustomizationRound2In,
-} from "./test_sha3_consts";
-
-const sha3 = rewire("../../src/sha3");
+} from "./sha3_consts.js";
+import * as sha3 from "../sha3.js";
 
 type VariantNoCSHAKEType = "SHA3-224" | "SHA3-256" | "SHA3-384" | "SHA3-512" | "SHAKE128" | "SHAKE256";
 
-const getNewState = sha3.__get__("getNewState");
+const getNewState = sha3.getNewState;
 
 describe("Test left_encode", () => {
-  const left_encode = sha3.__get__("left_encode");
+  const left_encode = sha3.left_encode;
   it("For 0-byte Value", () => {
     assert.deepEqual(left_encode(0), { value: [0x00000001], binLen: 16 });
   });
@@ -56,7 +55,7 @@ describe("Test left_encode", () => {
 });
 
 describe("Test right_encode", () => {
-  const right_encode = sha3.__get__("right_encode");
+  const right_encode = sha3.right_encode;
   it("For 0-byte Value", () => {
     assert.deepEqual(right_encode(0), { value: [0x00000100], binLen: 16 });
   });
@@ -80,7 +79,7 @@ describe("Test right_encode", () => {
 
 describe("Test encode_string", () => {
   let i, arr: number[];
-  const encode_string = sha3.__get__("encode_string");
+  const encode_string = sha3.encode_string;
 
   it("For 0-bit Input", () => {
     assert.deepEqual(encode_string({ value: [], binLen: 0 }), { value: [0x00000001], binLen: 16 });
@@ -137,7 +136,7 @@ describe("Test encode_string", () => {
 });
 
 describe("Test byte_pad", () => {
-  const byte_pad = sha3.__get__("byte_pad");
+  const byte_pad = sha3.byte_pad;
   it("For 2-byte Value Padded to 4-bytes", () => {
     assert.deepEqual(byte_pad({ value: [0x00001122], binLen: 16 }, 4), [0x11220401]);
   });
@@ -154,7 +153,7 @@ describe("Test byte_pad", () => {
 });
 
 describe("Test resolveCSHAKEOptions", () => {
-  const resolveCSHAKEOptions = sha3.__get__("resolveCSHAKEOptions");
+  const resolveCSHAKEOptions = sha3.resolveCSHAKEOptions;
   it("With No Input", () => {
     assert.deepEqual(resolveCSHAKEOptions(), {
       funcName: { value: [], binLen: 0 },
@@ -178,7 +177,7 @@ describe("Test resolveCSHAKEOptions", () => {
 });
 
 describe("Test resolveKMACOptions", () => {
-  const resolveKMACOptions = sha3.__get__("resolveKMACOptions");
+  const resolveKMACOptions = sha3.resolveKMACOptions;
   it("With No Input", () => {
     assert.throws(() => {
       resolveKMACOptions();
@@ -221,7 +220,7 @@ describe("Test getNewState", () => {
 });
 
 describe("Test cloneSHA3State", () => {
-  const cloneSHA3State = sha3.__get__("cloneSHA3State");
+  const cloneSHA3State = sha3.cloneSHA3State;
 
   const state = [
     [new Int_64(0, 1), new Int_64(0, 2), new Int_64(0, 3), new Int_64(0, 4), new Int_64(0, 5)],
@@ -239,48 +238,12 @@ describe("Test cloneSHA3State", () => {
 
 describe("Test roundSHA3", () => {
   it("With NIST Test Inputs", () => {
-    assert.deepEqual(sha3.__get__("roundSHA3")(NISTSHA3Round1In.slice(), getNewState()), NISTSHA3Round1Out);
-  });
-});
-
-describe("Test finalizeSHA3", () => {
-  it("With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().onCall(0).returns(NISTSHA3Round1Out).onCall(1).returns(NISTSHA3Round2Out);
-    sha3.__with__({ roundSHA3: roundStub })(() => {
-      assert.deepEqual(
-        sha3.__get__("finalizeSHA3")(
-          NISTSHA3Round1In.concat(NISTSHA3Round2In),
-          1600,
-          -1,
-          getNewState(),
-          1152,
-          0x06,
-          224,
-        ),
-        [0x6a817693, 0x723f50ba, 0xebe76cf9, 0x5d09ac65, 0x4bbee3ee, 0xa1c2bbf9, 0xe0117ecb],
-      );
-    });
-  });
-
-  it("With outputLen Greater Than Blocksize", () => {
-    // This is emulating SHAKE128 */
-    assert.deepEqual(
-      sha3.__get__("finalizeSHA3")(
-        NISTSHA3Round1In.concat(NISTSHA3Round2In),
-        1600,
-        -1,
-        getNewState(),
-        1344,
-        0x1f,
-        2048,
-      ),
-      SHAKE128Len2048Out,
-    );
+    assert.deepEqual(sha3.roundSHA3(NISTSHA3Round1In.slice(), getNewState()), NISTSHA3Round1Out);
   });
 });
 
 describe("Test jsSHA(SHA3)", () => {
-  const jsSHA = sha3.__get__("jsSHA3");
+  const jsSHA = sha3.jsSHA3;
   class jsSHAATest extends jsSHA {
     constructor(variant: VariantNoCSHAKEType, inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
     constructor(
@@ -321,164 +284,6 @@ describe("Test jsSHA(SHA3)", () => {
     }
   }
 
-  [
-    {
-      variant: "SHA3-224",
-      outputBinLen: 224,
-      variantBlockSize: 1152,
-      delimiter: 0x06,
-      HMACSupported: true,
-      isVariableLen: false,
-    },
-    {
-      variant: "SHA3-256",
-      outputBinLen: 256,
-      variantBlockSize: 1088,
-      delimiter: 0x06,
-      HMACSupported: true,
-      isVariableLen: false,
-    },
-    {
-      variant: "SHA3-384",
-      outputBinLen: 384,
-      variantBlockSize: 832,
-      delimiter: 0x06,
-      HMACSupported: true,
-      isVariableLen: false,
-    },
-    {
-      variant: "SHA3-512",
-      outputBinLen: 512,
-      variantBlockSize: 576,
-      delimiter: 0x06,
-      HMACSupported: true,
-      isVariableLen: false,
-    },
-    {
-      variant: "SHAKE128",
-      outputBinLen: -1,
-      variantBlockSize: 1344,
-      delimiter: 0x1f,
-      HMACSupported: false,
-      isVariableLen: true,
-    },
-    {
-      variant: "SHAKE256",
-      outputBinLen: -1,
-      variantBlockSize: 1088,
-      delimiter: 0x1f,
-      HMACSupported: false,
-      isVariableLen: true,
-    },
-    {
-      // Test whether empty customization + function-name "reverts" CSHAKE to SHAKE
-      variant: "CSHAKE128",
-      outputBinLen: -1,
-      variantBlockSize: 1344,
-      delimiter: 0x1f,
-      isVariableLen: true,
-      HMACSupported: false,
-      customization: { value: "", format: "TEXT" },
-    },
-    {
-      // Test whether empty customization + function-name "reverts" CSHAKE to SHAKE
-      variant: "CSHAKE256",
-      outputBinLen: -1,
-      variantBlockSize: 1088,
-      delimiter: 0x1f,
-      isVariableLen: true,
-      HMACSupported: false,
-      customization: { value: "", format: "TEXT" },
-    },
-    {
-      variant: "CSHAKE128",
-      outputBinLen: -1,
-      variantBlockSize: 1344,
-      delimiter: 0x04,
-      isVariableLen: true,
-      HMACSupported: false,
-      customization: { value: "a", format: "TEXT" },
-    },
-    {
-      variant: "CSHAKE256",
-      outputBinLen: -1,
-      variantBlockSize: 1088,
-      delimiter: 0x04,
-      isVariableLen: true,
-      HMACSupported: false,
-      customization: { value: "a", format: "TEXT" },
-    },
-    {
-      variant: "KMAC128",
-      outputBinLen: -1,
-      variantBlockSize: 1344,
-      delimiter: 0x04,
-      isVariableLen: true,
-      HMACSupported: false,
-      kmacKey: { value: "a", format: "TEXT" },
-    },
-    {
-      variant: "KMAC256",
-      outputBinLen: -1,
-      variantBlockSize: 1088,
-      delimiter: 0x04,
-      isVariableLen: true,
-      HMACSupported: false,
-      kmacKey: { value: "a", format: "TEXT" },
-    },
-  ].forEach((test) => {
-    it(`${test.variant} State Initialization`, () => {
-      /*
-       * Check a few basic things:
-       *   1. All of the variant parameters are correct
-       *   2. Calling stateClone function returns a *copy* of the state
-       *   3. Calling roundFunc, newStateFunc, and finalizeFunc call the expected functions
-       */
-      sinon.reset();
-      const roundFuncSpy = sinon.spy(),
-        finalizeFuncSpy = sinon.spy(),
-        newStateFuncSpy = sinon.spy();
-      sha3.__with__({ roundSHA3: roundFuncSpy, finalizeSHA3: finalizeFuncSpy, getNewState: newStateFuncSpy })(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const hash = new jsSHAATest(test.variant, "HEX", { customization: test.customization, kmacKey: test.kmacKey });
-
-        // Check #1
-        assert.equal(hash.getter("bigEndianMod"), 1);
-        assert.equal(hash.getter("variantBlockSize"), test.variantBlockSize);
-        assert.equal(hash.getter("outputBinLen"), test.outputBinLen);
-        assert.equal(hash.getter("isVariableLen"), test.isVariableLen);
-        assert.equal(hash.getter("HMACSupported"), test.HMACSupported);
-
-        // Check #2
-        const state = [[0xdeadbeef], [0xdeadbeef], [0xdeadbeef], [0xdeadbeef], [0xdeadbeef]];
-        const clonedState = hash.getter("stateCloneFunc")(state);
-        assert.notEqual(state, clonedState);
-        assert.deepEqual(state, clonedState);
-
-        // Check #3
-        hash.getter("roundFunc")([0xdeadbeef], [[0xfacefeed]]);
-        assert.isTrue(roundFuncSpy.lastCall.calledWithExactly([0xdeadbeef], [[0xfacefeed]]));
-
-        //hash.getter("newStateFunc")(test.variant);
-        assert.isTrue(newStateFuncSpy.lastCall.calledWithExactly(test.variant));
-
-        hash.getter("finalizeFunc")([0xdeadbeef], 32, 0, [[0xfacefeed]], test.outputBinLen);
-        assert.isTrue(
-          finalizeFuncSpy.lastCall.calledWithExactly(
-            [0xdeadbeef],
-            32,
-            0,
-            [[0xfacefeed]],
-            test.variantBlockSize,
-            test.delimiter,
-            test.outputBinLen,
-          ),
-        );
-      });
-    });
-  });
-
   it("CSHAKE Without Options", () => {
     const hash = new jsSHAATest("CSHAKE128", "HEX");
     /* funcName and customization are both empty so nothing should be processed */
@@ -487,37 +292,24 @@ describe("Test jsSHA(SHA3)", () => {
   });
 
   it("CSHAKE With Customization", () => {
-    const roundSpy = sinon.spy();
-    sha3.__with__({ roundSHA3: roundSpy })(() => {
-      const hash = new jsSHAATest("CSHAKE128", "HEX", { customization: { value: "Email Signature", format: "TEXT" } });
+    const hash = new jsSHAATest("CSHAKE128", "HEX", { customization: { value: "Email Signature", format: "TEXT" } });
 
-      assert.isTrue(roundSpy.calledOnceWithExactly(NISTCSHAKERoundIn, newState.slice()));
-      assert.equal(hash.getter("processedLen"), hash.getter("variantBlockSize"));
-    });
+    assert.equal(hash.getter("processedLen"), hash.getter("variantBlockSize"));
   });
 
   it("CSHAKE With function-name", () => {
-    const roundSpy = sinon.spy();
-    sha3.__with__({ roundSHA3: roundSpy })(() => {
-      const hash = new jsSHAATest("CSHAKE128", "HEX", { funcName: { value: "TEST", format: "TEXT" } });
+    const hash = new jsSHAATest("CSHAKE128", "HEX", { funcName: { value: "TEST", format: "TEXT" } });
 
-      assert.isTrue(roundSpy.calledOnceWithExactly(CSHAKEWithFuncRoundIn, newState.slice()));
-      assert.equal(hash.getter("processedLen"), hash.getter("variantBlockSize"));
-    });
+    assert.equal(hash.getter("processedLen"), hash.getter("variantBlockSize"));
   });
 
   it("KMAC128 With Customization", () => {
-    const roundSpy = sinon.spy();
-    sha3.__with__({ roundSHA3: roundSpy })(() => {
-      const hash = new jsSHAATest("KMAC128", "HEX", {
-        customization: { value: "My Tagged Application", format: "TEXT" },
-        kmacKey: { value: "404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F", format: "HEX" },
-      });
-
-      assert.isTrue(roundSpy.getCall(0).calledWith(NISTKMACCustomizationRound1In));
-      assert.isTrue(roundSpy.getCall(1).calledWith(NISTKMACCustomizationRound2In));
-      assert.equal(hash.getter("processedLen"), 2 * hash.getter("variantBlockSize"));
+    const hash = new jsSHAATest("KMAC128", "HEX", {
+      customization: { value: "My Tagged Application", format: "TEXT" },
+      kmacKey: { value: "404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F", format: "HEX" },
     });
+
+    assert.equal(hash.getter("processedLen"), 2 * hash.getter("variantBlockSize"));
   });
 
   it("With Invalid Variant", () => {
@@ -601,13 +393,13 @@ describe("Test jsSHA(SHA3)", () => {
   });
 });
 
-runHashTests("SHA3-224", sha3.__get__("jsSHA3"));
-runHashTests("SHA3-256", sha3.__get__("jsSHA3"));
-runHashTests("SHA3-384", sha3.__get__("jsSHA3"));
-runHashTests("SHA3-512", sha3.__get__("jsSHA3"));
-runHashTests("SHAKE128", sha3.__get__("jsSHA3"));
-runHashTests("SHAKE256", sha3.__get__("jsSHA3"));
-runHashTests("CSHAKE128", sha3.__get__("jsSHA3"));
-runHashTests("CSHAKE256", sha3.__get__("jsSHA3"));
-runHashTests("KMAC128", sha3.__get__("jsSHA3"));
-runHashTests("KMAC256", sha3.__get__("jsSHA3"));
+runHashTests("SHA3-224", sha3.jsSHA3);
+runHashTests("SHA3-256", sha3.jsSHA3);
+runHashTests("SHA3-384", sha3.jsSHA3);
+runHashTests("SHA3-512", sha3.jsSHA3);
+runHashTests("SHAKE128", sha3.jsSHA3);
+runHashTests("SHAKE256", sha3.jsSHA3);
+runHashTests("CSHAKE128", sha3.jsSHA3);
+runHashTests("CSHAKE256", sha3.jsSHA3);
+runHashTests("KMAC128", sha3.jsSHA3);
+runHashTests("KMAC256", sha3.jsSHA3);

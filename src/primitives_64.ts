@@ -54,7 +54,7 @@ export function rotl_64(x: Int_64, n: number): Int_64 {
  * @param n The number of bits to shift.
  * @returns `x` shifted right circularly by `n` bits.
  */
-function rotr_64(x: Int_64, n: number): Int_64 {
+export function rotr_64(x: Int_64, n: number): Int_64 {
   let tmp;
   if (n < 32) {
     tmp = 32 - n;
@@ -74,7 +74,7 @@ function rotr_64(x: Int_64, n: number): Int_64 {
  * @param n The number of bits to shift.
  * @returns `x` shifted right by `n` bits
  */
-function shr_64(x: Int_64, n: number): Int_64 {
+export function shr_64(x: Int_64, n: number): Int_64 {
   return new Int_64(x.highOrder >>> n, (x.lowOrder >>> n) | (x.highOrder << (32 - n)));
 }
 

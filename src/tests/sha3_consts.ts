@@ -1,4 +1,4 @@
-import { Int_64 } from "../../src/primitives_64";
+import { Int_64 } from "../primitives_64.js";
 
 export const NISTCSHAKERoundIn = [
   0x0001a801,

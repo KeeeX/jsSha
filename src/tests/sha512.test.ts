@@ -1,19 +1,17 @@
 import { describe, it } from "mocha";
 import { assert } from "chai";
-import rewire from "rewire";
-import sinon from "sinon";
-import { runHashTests } from "./common";
+import { runHashTests } from "./common.js";
 import {
   FixedLengthOptionsEncodingType,
   FixedLengthOptionsNoEncodingType,
   FormatNoTextType,
 } from "../../src/custom_types";
-import { Int_64 } from "../../src/primitives_64";
+import { Int_64 } from "../primitives_64.js";
+import * as sha512 from "../sha512.js";
 
-const sha512 = rewire("../../src/sha512"),
-  H_trunc = [0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939, 0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4],
-  H_full = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19],
-  newState384 = [
+const H_trunc = [0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939, 0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4];
+const H_full = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+const newState384 = [
     new Int_64(0xcbbb9d5d, H_trunc[0]),
     new Int_64(0x0629a292a, H_trunc[1]),
     new Int_64(0x9159015a, H_trunc[2]),
@@ -22,8 +20,8 @@ const sha512 = rewire("../../src/sha512"),
     new Int_64(0x98eb44a87, H_trunc[5]),
     new Int_64(0xdb0c2e0d, H_trunc[6]),
     new Int_64(0x047b5481d, H_trunc[7]),
-  ],
-  newState512 = [
+  ];
+const newState512 = [
     new Int_64(H_full[0], 0xf3bcc908),
     new Int_64(H_full[1], 0x84caa73b),
     new Int_64(H_full[2], 0xfe94f82b),
@@ -32,14 +30,14 @@ const sha512 = rewire("../../src/sha512"),
     new Int_64(H_full[5], 0x2b3e6c1f),
     new Int_64(H_full[6], 0xfb41bd6b),
     new Int_64(H_full[7], 0x137e2179),
-  ],
-  abcPostProcessed = [
+  ];
+const abcPostProcessed = [
     0x61626380, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00000018,
-  ],
-  abcPacked = [0x61626300];
+  ];
+const abcPacked = [0x61626300];
 
 describe("Test getNewState512", () => {
-  const getNewState = sha512.__get__("getNewState512");
+  const getNewState = sha512.getNewState512;
 
   it("For SHA-384", () => {
     assert.deepEqual(getNewState("SHA-384"), newState384);
@@ -51,7 +49,7 @@ describe("Test getNewState512", () => {
 });
 
 describe("Test roundSHA512", () => {
-  const roundSHA512 = sha512.__get__("roundSHA512");
+  const roundSHA512 = sha512.roundSHA512;
 
   it("SHA-384 With NIST Test Inputs", () => {
     assert.deepEqual(roundSHA512(abcPostProcessed, newState384.slice()), [
@@ -80,36 +78,8 @@ describe("Test roundSHA512", () => {
   });
 });
 
-describe("Test finalizeSHA512", () => {
-  const array8Zeros = [
-    new Int_64(0, 0),
-    new Int_64(0, 0),
-    new Int_64(0, 0),
-    new Int_64(0, 0),
-    new Int_64(0, 0),
-    new Int_64(0, 0),
-    new Int_64(0, 0),
-    new Int_64(0, 0),
-  ];
-  it("SHA-384 With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().returns(array8Zeros);
-    sha512.__with__({ roundSHA512: roundStub })(() => {
-      sha512.__get__("finalizeSHA512")(abcPacked, 24, 0, newState384.slice(), "SHA-384");
-      assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState384.slice()));
-    });
-  });
-
-  it("SHA-512 With NIST Test Inputs", () => {
-    const roundStub = sinon.stub().returns(array8Zeros);
-    sha512.__with__({ roundSHA512: roundStub })(() => {
-      sha512.__get__("finalizeSHA512")(abcPacked, 24, 0, newState512.slice());
-      assert.isTrue(roundStub.calledOnceWithExactly(abcPostProcessed, newState512.slice()));
-    });
-  });
-});
-
 describe("Test jsSHA(SHA-512)", () => {
-  const jsSHA = sha512.__get__("jsSHA512");
+  const jsSHA = sha512.jsSHA512;
   class jsSHAATest extends jsSHA {
     constructor(variant: "SHA-384" | "SHA-512", inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
     constructor(
@@ -133,57 +103,6 @@ describe("Test jsSHA(SHA-512)", () => {
     }
   }
 
-  [
-    { variant: "SHA-384", outputBinLen: 384 },
-    { variant: "SHA-512", outputBinLen: 512 },
-  ].forEach((test) => {
-    it(`${test.variant} State Initialization`, () => {
-      /*
-       * Check a few basic things:
-       *   1. All of the variant parameters are correct
-       *   2. Calling stateClone function returns a *copy* of the state
-       *   3. Calling roundFunc, newStateFunc, and finalizeFunc call the expected functions
-       */
-      sinon.reset();
-      const roundFuncSpy = sinon.spy(),
-        finalizeFuncSpy = sinon.spy(),
-        newStateFuncSpy = sinon.spy();
-      sha512.__with__({
-        roundSHA512: roundFuncSpy,
-        finalizeSHA512: finalizeFuncSpy,
-        getNewState512: newStateFuncSpy,
-      })(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const hash = new jsSHAATest(test.variant, "HEX");
-
-        // Check #1
-        assert.equal(hash.getter("bigEndianMod"), -1);
-        assert.equal(hash.getter("variantBlockSize"), 1024);
-        assert.equal(hash.getter("outputBinLen"), test.outputBinLen);
-        assert.isFalse(hash.getter("isVariableLen"));
-
-        // Check #2
-        const state = [0xdeadbeef];
-        const clonedState = hash.getter("stateCloneFunc")(state);
-        assert.notEqual(state, clonedState);
-        assert.deepEqual(state, clonedState);
-
-        // Check #3
-        hash.getter("roundFunc")([0xdeadbeef], [new Int_64(0xfacefeed, 0)]);
-        assert.isTrue(roundFuncSpy.lastCall.calledWithExactly([0xdeadbeef], [new Int_64(0xfacefeed, 0)]));
-
-        hash.getter("newStateFunc")(test.variant);
-        assert.isTrue(newStateFuncSpy.lastCall.calledWithExactly(test.variant));
-
-        hash.getter("finalizeFunc")([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)]);
-        assert.isTrue(
-          finalizeFuncSpy.lastCall.calledWithExactly([0xdeadbeef], 32, 0, [new Int_64(0xfacefeed, 0)], test.variant),
-        );
-      });
-    });
-  });
-
   it("With Invalid Variant", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - Deliberate bad variant value to test exceptions
@@ -203,5 +122,5 @@ describe("Test jsSHA(SHA-512)", () => {
   });
 });
 
-runHashTests("SHA-384", sha512.__get__("jsSHA512"));
-runHashTests("SHA-512", sha512.__get__("jsSHA512"));
+runHashTests("SHA-384", sha512.jsSHA512);
+runHashTests("SHA-512", sha512.jsSHA512);

@@ -1,4 +1,4 @@
-import { packedValue, EncodingType, FormatType } from "./custom_types";
+import { packedValue, EncodingType, FormatType } from "./custom_types.js";
 /**
  * Return type for all the *2packed functions
  */
