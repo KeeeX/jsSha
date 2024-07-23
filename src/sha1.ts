@@ -1,94 +1,123 @@
-import { jsSHABase, TWO_PWR_32, sha_variant_error, parseInputOption } from "./common.js";
-import {
-  packedValue,
-  FixedLengthOptionsEncodingType,
-  FixedLengthOptionsNoEncodingType,
-  FormatNoTextType,
-} from "./custom_types.js";
-import { getStrConverter } from "./converters.js";
-import { ch_32, parity_32, maj_32, rotl_32, safeAdd_32_2, safeAdd_32_5 } from "./primitives_32.js";
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import * as common from "./common.js";
+import * as customTypes from "./custom_types.js";
+import * as converters from "./converters.js";
+import * as primitives32 from "./primitives_32.js";
+
+type Sha1State = Array<number>;
+
+export enum Sha1VariantType {
+  sha1 = "SHA-1",
+}
+Object.freeze(Sha1VariantType);
 
 /**
  * Gets the state values for the specified SHA variant.
  *
- * @param _variant: Unused
  * @returns The initial state values.
  */
-export function getNewState(_variant: "SHA-1"): number[] {
-  return [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
-}
+export const getNewState = (): Sha1State => [
+  0x67452301,
+  0xefcdab89,
+  0x98badcfe,
+  0x10325476,
+  0xc3d2e1f0,
+];
 
 /**
  * Performs a round of SHA-1 hashing over a 512-byte block.  This clobbers `H`.
  *
- * @param block The binary array representation of the block to hash.
- * @param H The intermediate H values from a previous round.
+ * @param block - The binary array representation of the block to hash.
+ * @param h - The intermediate H values from a previous round.
  * @returns The resulting H values.
  */
-export function roundSHA1(block: number[], H: number[]): number[] {
-  let a, b, c, d, e, T, t;
-  const W: number[] = [];
-
-  a = H[0];
-  b = H[1];
-  c = H[2];
-  d = H[3];
-  e = H[4];
-
-  for (t = 0; t < 80; t += 1) {
+// eslint-disable-next-line max-lines-per-function
+export const roundSHA1 = (block: Array<number>, h: Sha1State): Sha1State => {
+  const W: Sha1State = [];
+  let a = h[0];
+  let b = h[1];
+  let c = h[2];
+  let d = h[3];
+  let e = h[4];
+  for (let t = 0; t < 80; t += 1) {
     if (t < 16) {
       W[t] = block[t];
     } else {
-      W[t] = rotl_32(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1);
+      W[t] = primitives32.rotl32(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1);
     }
-
+    let T;
     if (t < 20) {
-      T = safeAdd_32_5(rotl_32(a, 5), ch_32(b, c, d), e, 0x5a827999, W[t]);
+      T = primitives32.safeAddFive32(
+        primitives32.rotl32(a, 5),
+        primitives32.ch32(b, c, d),
+        e,
+        0x5a827999,
+        W[t],
+      );
     } else if (t < 40) {
-      T = safeAdd_32_5(rotl_32(a, 5), parity_32(b, c, d), e, 0x6ed9eba1, W[t]);
+      T = primitives32.safeAddFive32(
+        primitives32.rotl32(a, 5),
+        primitives32.parity32(b, c, d),
+        e,
+        0x6ed9eba1,
+        W[t],
+      );
     } else if (t < 60) {
-      T = safeAdd_32_5(rotl_32(a, 5), maj_32(b, c, d), e, 0x8f1bbcdc, W[t]);
+      T = primitives32.safeAddFive32(
+        primitives32.rotl32(a, 5),
+        primitives32.maj32(b, c, d),
+        e,
+        0x8f1bbcdc,
+        W[t],
+      );
     } else {
-      T = safeAdd_32_5(rotl_32(a, 5), parity_32(b, c, d), e, 0xca62c1d6, W[t]);
+      T = primitives32.safeAddFive32(
+        primitives32.rotl32(a, 5),
+        primitives32.parity32(b, c, d),
+        e,
+        0xca62c1d6,
+        W[t],
+      );
     }
-
     e = d;
     d = c;
-    c = rotl_32(b, 30);
+    c = primitives32.rotl32(b, 30);
     b = a;
     a = T;
   }
-
-  H[0] = safeAdd_32_2(a, H[0]);
-  H[1] = safeAdd_32_2(b, H[1]);
-  H[2] = safeAdd_32_2(c, H[2]);
-  H[3] = safeAdd_32_2(d, H[3]);
-  H[4] = safeAdd_32_2(e, H[4]);
-
-  return H;
-}
+  h[0] = primitives32.safeAddTwo32(a, h[0]);
+  h[1] = primitives32.safeAddTwo32(b, h[1]);
+  h[2] = primitives32.safeAddTwo32(c, h[2]);
+  h[3] = primitives32.safeAddTwo32(d, h[3]);
+  h[4] = primitives32.safeAddTwo32(e, h[4]);
+  return h;
+};
 
 /**
  * Finalizes the SHA-1 hash.  This clobbers `remainder` and `H`.
  *
- * @param remainder Any leftover unprocessed packed ints that still need to be processed.
- * @param remainderBinLen The number of bits in `remainder`.
- * @param processedBinLen The number of bits already processed.
- * @param H The intermediate H values from a previous round.
+ * @param remainder - Any leftover unprocessed packed ints that still need to be processed.
+ * @param remainderBinLen - The number of bits in `remainder`.
+ * @param processedBinLen - The number of bits already processed.
+ * @param h - The intermediate H values from a previous round.
  * @returns The array of integers representing the SHA-1 hash of message.
  */
-export function finalizeSHA1(remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]): number[] {
-  let i;
-
+export const finalizeSHA1 = (
+  remainder: Array<number>,
+  remainderBinLen: number,
+  processedBinLen: number,
+  h: Sha1State,
+): Array<number> => {
   /* The 65 addition is a hack but it works.  The correct number is
-		actually 72 (64 + 8) but the below math fails if
-		remainderBinLen + 72 % 512 = 0. Since remainderBinLen % 8 = 0,
-		"shorting" the addition is OK. */
-  const offset = (((remainderBinLen + 65) >>> 9) << 4) + 15,
-    totalLen = remainderBinLen + processedBinLen;
-  while (remainder.length <= offset) {
-    remainder.push(0);
-  }
+   * actually 72 (64 + 8) but the below math fails if
+   * remainderBinLen + 72 % 512 = 0. Since remainderBinLen % 8 = 0,
+   * "shorting" the addition is OK.
+   */
+  const offset = (((remainderBinLen + 65) >>> 9) << 4) + 15;
+  const totalLen = remainderBinLen + processedBinLen;
+
+  while (remainder.length <= offset) remainder.push(0);
+
   /* Append '1' at the end of the binary string */
   remainder[remainderBinLen >>> 5] |= 0x80 << (24 - (remainderBinLen % 32));
 
@@ -101,61 +130,72 @@ export function finalizeSHA1(remainder: number[], remainderBinLen: number, proce
 
   /* Bitwise operators treat the operand as a 32-bit number so need to
    * use hacky division and round to get access to upper 32-ish bits */
-  remainder[offset - 1] = (totalLen / TWO_PWR_32) | 0;
+  remainder[offset - 1] = (totalLen / common.TWO_PWR_32) | 0;
 
+  let resultH = h;
   /* This will always be at least 1 full chunk */
-  for (i = 0; i < remainder.length; i += 16) {
-    H = roundSHA1(remainder.slice(i, i + 16), H);
+  for (let i = 0; i < remainder.length; i += 16) {
+    resultH = roundSHA1(remainder.slice(i, i + 16), resultH);
   }
+  return resultH;
+};
 
-  return H;
-}
+export class JsSha1 extends common.JsSHABase<Sha1State, Sha1VariantType> {
+  protected converterFunc: converters.GenericConverter;
+  protected roundFunc: customTypes.RoundFunc<Sha1State> = roundSHA1;
+  protected finalizeFunc: customTypes.FinalizeFunc<Sha1State> = finalizeSHA1;
+  protected newStateFunc: customTypes.NewStateFunc<Sha1State, Sha1VariantType> = getNewState;
+  protected getMAC: customTypes.GetMacFunc = this._getHMAC;
 
-export class jsSHA1 extends jsSHABase<number[], "SHA-1"> {
-  intermediateState: number[];
-  variantBlockSize: number;
-  bigEndianMod: -1 | 1;
-  outputBinLen: number;
-  isVariableLen: boolean;
-  HMACSupported: boolean;
+  public constructor(
+    variant: Sha1VariantType.sha1,
+    inputFormat: customTypes.FormatType.text,
+    options?: customTypes.FixedLengthOptionsEncodingType,
+  );
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  converterFunc: (input: any, existingBin: number[], existingBinLen: number) => packedValue;
-  roundFunc: (block: number[], H: number[]) => number[];
-  finalizeFunc: (remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]) => number[];
-  stateCloneFunc: (state: number[]) => number[];
-  newStateFunc: (variant: "SHA-1") => number[];
-  getMAC: () => number[];
+  public constructor(
+    variant: Sha1VariantType.sha1,
+    inputFormat: customTypes.FormatNoTextType,
+    options?: customTypes.FixedLengthOptionsNoEncodingType,
+  );
 
-  constructor(variant: "SHA-1", inputFormat: "TEXT", options?: FixedLengthOptionsEncodingType);
-  constructor(variant: "SHA-1", inputFormat: FormatNoTextType, options?: FixedLengthOptionsNoEncodingType);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(variant: any, inputFormat: any, options?: any) {
-    if ("SHA-1" !== variant) {
-      throw new Error(sha_variant_error);
-    }
-    super(variant, inputFormat, options);
-    const resolvedOptions = options || {};
+  public constructor(
+    variant: Sha1VariantType,
+    inputFormat: customTypes.FormatType,
+    options?: customTypes.FixedLengthOptionsEncodingType
+    | customTypes.FixedLengthOptionsNoEncodingType,
+  ) {
+    super(
+      {
+        intermediateState: getNewState(),
+        variantBlockSize: 512,
+        bigEndianMod: -1,
+        outputBinLen: 160,
+        isVariableLen: false,
+        hmacSupported: true,
+      },
+      variant,
+      inputFormat as customTypes.FormatNoTextType,
+      options,
+    );
 
-    this.HMACSupported = true;
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    this.getMAC = this._getHMAC;
-    this.bigEndianMod = -1;
-    this.converterFunc = getStrConverter(this.inputFormat, this.utfType, this.bigEndianMod);
-    this.roundFunc = roundSHA1;
-    this.stateCloneFunc = function (state: number[]): number[] {
-      return state.slice();
-    };
-    this.newStateFunc = getNewState;
-    this.finalizeFunc = finalizeSHA1;
+    this.converterFunc = converters.getStrConverter(
+      this.inputFormat,
+      this.utfType,
+      this.bigEndianMod,
+    );
 
-    this.intermediateState = getNewState(variant);
-    this.variantBlockSize = 512;
-    this.outputBinLen = 160;
-    this.isVariableLen = false;
-
-    if (resolvedOptions["hmacKey"]) {
-      this._setHMACKey(parseInputOption("hmacKey", resolvedOptions["hmacKey"], this.bigEndianMod));
+    const resolvedOptions = options ?? {};
+    if ("hmacKey" in resolvedOptions) {
+      this._setHMACKey(common.parseInputOption(
+        "hmacKey",
+        resolvedOptions["hmacKey"],
+        this.bigEndianMod,
+      ));
     }
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  protected stateCloneFunc: customTypes.StateCloneFunc<Sha1State> = state => state.slice();
 }

@@ -1,47 +1,75 @@
-/* No actual code can go in this file without changing rollup.config.js and .gitignore */
-export type EncodingType = "UTF8" | "UTF16BE" | "UTF16LE";
-export type FormatNoTextType = "HEX" | "B64" | "BYTES" | "ARRAYBUFFER" | "UINT8ARRAY";
-export type FormatType = "TEXT" | FormatNoTextType;
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+export enum EncodingType {
+  utf16BE = "UTF16BE",
+  utf16LE = "UTF16LE",
+  utf8 = "UTF8",
+}
+Object.freeze(EncodingType);
+
+export enum FormatType {
+  arrayBuffer = "ARRAYBUFFER",
+  b64 = "B64",
+  bytes = "BYTES",
+  hex = "HEX",
+  text = "TEXT",
+  uint8Array = "UINT8ARRAY",
+}
+Object.freeze(FormatType);
+
+export type FormatNoTextType =
+| FormatType.arrayBuffer
+| FormatType.b64
+| FormatType.bytes
+| FormatType.hex
+| FormatType.uint8Array;
+
+interface InputTypeText {
+  value: string;
+  format: FormatType.text;
+  encoding?: EncodingType;
+}
+
+interface InputTypeBinaryString {
+  value: string;
+  format: FormatType.b64 | FormatType.hex | FormatType.bytes;
+}
+
+interface InputTypeArrayBuffer {
+  value: ArrayBuffer;
+  format: FormatType.arrayBuffer;
+}
+
+interface InputTypeUint8Array {
+  value: Uint8Array;
+  format: FormatType.uint8Array;
+}
 
 export type GenericInputType =
-  | {
-      value: string;
-      format: "TEXT";
-      encoding?: EncodingType;
-    }
-  | {
-      value: string;
-      format: "B64" | "HEX" | "BYTES";
-    }
-  | {
-      value: ArrayBuffer;
-      format: "ARRAYBUFFER";
-    }
-  | {
-      value: Uint8Array;
-      format: "UINT8ARRAY";
-    };
+| InputTypeText
+| InputTypeBinaryString
+| InputTypeArrayBuffer
+| InputTypeUint8Array;
+
+interface FLOptsNoEncTypeHmac {
+  hmacKey?: GenericInputType;
+}
+
+interface FLOptsNoEncTypeRounds {
+  numRounds?: number;
+}
 
 export type FixedLengthOptionsNoEncodingType =
-  | {
-      hmacKey?: GenericInputType;
-    }
-  | {
-      numRounds?: number;
-    };
+| FLOptsNoEncTypeHmac
+| FLOptsNoEncTypeRounds;
 
-export type FixedLengthOptionsEncodingType =
-  | {
-      hmacKey?: GenericInputType;
-      encoding?: EncodingType;
-    }
-  | {
-      numRounds?: number;
-      encoding?: EncodingType;
-    };
+interface OptsEncType {
+  encoding?: EncodingType;
+}
 
-export interface packedValue {
-  value: number[];
+export type FixedLengthOptionsEncodingType = FixedLengthOptionsNoEncodingType & OptsEncType;
+
+export interface PackedValue {
+  value: Array<number>;
   binLen: number;
 }
 
@@ -65,6 +93,7 @@ export interface CSHAKEOptionsEncodingType extends CSHAKEOptionsNoEncodingType {
 export interface KMACOptionsNoEncodingType {
   kmacKey: GenericInputType;
   customization?: GenericInputType;
+  funcName?: GenericInputType;
 }
 
 export interface KMACOptionsEncodingType extends KMACOptionsNoEncodingType {
@@ -72,10 +101,28 @@ export interface KMACOptionsEncodingType extends KMACOptionsNoEncodingType {
 }
 
 export interface ResolvedCSHAKEOptionsNoEncodingType {
-  funcName: packedValue;
-  customization: packedValue;
+  funcName: PackedValue;
+  customization: PackedValue;
 }
 
 export interface ResolvedKMACOptionsNoEncodingType extends ResolvedCSHAKEOptionsNoEncodingType {
-  kmacKey: packedValue;
+  kmacKey: PackedValue;
 }
+
+export type RoundFunc<StateT> = (block: Array<number>, H: StateT) => StateT;
+
+export type FinalizeFunc<StateT> = (
+  remainder: Array<number>,
+  remainderBinLen: number,
+  processedBinLen: number,
+  H: StateT,
+  outputLen: number
+) => Array<number>;
+
+export type StateCloneFunc<StateT> = (state: StateT) => StateT;
+
+export type NewStateFunc<StateT, VariantT> = (variant: VariantT) => StateT;
+
+export type GetMacFunc = (options: {outputLen: number}) => Array<number>;
+
+export type BigEndianMod = 1 | -1;
