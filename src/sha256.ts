@@ -181,7 +181,7 @@ export class JsSha256 extends common.JsSHABase<Sha256State, Sha256VariantType> {
     );
 
     const resolvedOptions = options ?? {};
-    if ("hmacKey" in resolvedOptions) {
+    if ("hmacKey" in resolvedOptions && resolvedOptions.hmacKey) {
       this._setHMACKey(common.parseInputOption("hmacKey", resolvedOptions["hmacKey"], this.bigEndianMod));
     }
   }

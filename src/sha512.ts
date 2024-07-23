@@ -304,8 +304,10 @@ export class JsSha512 extends common.JsSHABase<Sha512State, Sha512VariantType> {
     );
 
     const resolvedOptions = options ?? {};
-    if ("hmacKey" in resolvedOptions) {
-      this._setHMACKey(common.parseInputOption("hmacKey", resolvedOptions.hmacKey, this.bigEndianMod));
+    if ("hmacKey" in resolvedOptions && resolvedOptions.hmacKey) {
+      this._setHMACKey(
+        common.parseInputOption("hmacKey", resolvedOptions.hmacKey, this.bigEndianMod),
+      );
     }
   }
 

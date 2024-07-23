@@ -187,7 +187,7 @@ export class JsSha1 extends common.JsSHABase<Sha1State, Sha1VariantType> {
     );
 
     const resolvedOptions = options ?? {};
-    if ("hmacKey" in resolvedOptions) {
+    if ("hmacKey" in resolvedOptions && resolvedOptions.hmacKey) {
       this._setHMACKey(common.parseInputOption(
         "hmacKey",
         resolvedOptions["hmacKey"],

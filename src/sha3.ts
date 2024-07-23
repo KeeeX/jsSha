@@ -527,7 +527,10 @@ export class JsSHA3 extends common.JsSHABase<Sha3State, Sha3VariantType> {
      * because we want to avoid KMAC initialization
      */
     if (this.numRounds !== 1) {
-      if ("kmacKey" in resolvedOptions || "hmacKey" in resolvedOptions) {
+      if (
+        ("kmacKey" in resolvedOptions && resolvedOptions.kmacKey)
+        || ("hmacKey" in resolvedOptions && resolvedOptions.hmacKey)
+      ) {
         throw new Error(common.macRoundsError);
       } else if (
         this.shaVariant === Sha3VariantType.cshake128
@@ -563,8 +566,10 @@ export class JsSHA3 extends common.JsSHABase<Sha3State, Sha3VariantType> {
       outputBinLen,
     );
 
-    if ("hmacKey" in resolvedOptions) {
-      this._setHMACKey(common.parseInputOption("hmacKey", resolvedOptions.hmacKey, this.bigEndianMod));
+    if ("hmacKey" in resolvedOptions && resolvedOptions.hmacKey) {
+      this._setHMACKey(
+        common.parseInputOption("hmacKey", resolvedOptions.hmacKey, this.bigEndianMod),
+      );
     }
   }
 
