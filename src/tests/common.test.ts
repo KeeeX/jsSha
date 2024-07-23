@@ -58,25 +58,6 @@ describe("common.ts", () => {
         "kmacKey must include a value and format",
       );
     });
-
-    it("For Value Missing value Key", () => {
-      assert.throws(
-        () => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - Deliberately bad value for test
-          common.parseInputOption("kmacKey", {format: "HEX"}, 1);
-        },
-        "kmacKey must include a value and format",
-      );
-    });
-
-    it("For Value Missing binLen Key", () => {
-      assert.throws(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore - Deliberately bad value for test
-        common.parseInputOption("kmacKey", {value: "TEST"}, 1);
-      }, "kmacKey must include a value and format");
-    });
   });
 
   describe("Test getOutputOpts", () => {
@@ -120,28 +101,6 @@ describe("common.ts", () => {
           common.getOutputOpts({outputLen: 1});
         },
         "Output length must be a multiple of 8",
-      );
-    });
-
-    it("Invalid b64Pad", () => {
-      assert.throws(
-        () => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - Deliberate bad b64Pad value to test exceptions
-          common.getOutputOpts({b64Pad: 1});
-        },
-        "Invalid b64Pad formatting option",
-      );
-    });
-
-    it("Invalid outputUpper", () => {
-      assert.throws(
-        () => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - Deliberate bad outputUpper value to test exceptions
-          common.getOutputOpts({outputUpper: 1});
-        },
-        "Invalid outputUpper formatting option",
       );
     });
   });

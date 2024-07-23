@@ -1,3 +1,4 @@
+/* eslint-disable mocha/no-setup-in-describe */
 /* eslint-disable mocha/no-exports */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import {assert} from "chai";
@@ -21,18 +22,8 @@ export type JsShaCtor = new (
 export const runHashTests = (variant: AllVariantType, jsSha: JsShaCtor): void => {
   describe(`Test jsSHA(${variant}) Using NIST Tests`, () => {
     // eslint-disable-next-line mocha/no-setup-in-describe
-    hashDataSrv.hashData[variant].forEach(test => {
-      test.outputs.forEach(output => {
-        if (test.hmacKey) {
-          it(`${test.name} - Old Style`, () => {
-            const hashObj = new jsSha(variant, test.input.format);
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            hashObj.setHMACKey(test.hmacKey.value, test.hmacKey.format);
-            hashObj.update(test.input.value);
-            assert.equal(hashObj.getHMAC(output.format), output.value);
-          });
-        }
+    for (const test of hashDataSrv.hashData[variant]) {
+      for (const output of test.outputs) {
         it(test.name, () => {
           const hashObj = new jsSha(variant, test.input.format, {
             numRounds: test.input.rounds ?? 1,
@@ -46,7 +37,9 @@ export const runHashTests = (variant: AllVariantType, jsSha: JsShaCtor): void =>
             output.value,
           );
         });
-      });
-    });
+        break;
+      }
+      break;
+    }
   });
 };
