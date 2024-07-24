@@ -1,8 +1,68 @@
 {
-  "name": "jssha",
+  "name": "@keeex/jssha",
   "version": "3.3.1",
   "description": "jsSHA implements the complete Secure Hash Standard (SHA) family (SHA-1, SHA-224/256/384/512, SHA3-224/256/384/512, SHAKE128/256, cSHAKE128/256, and KMAC128/256) with HMAC",
   "main": "./lib/sha.js",
+  "cleanPublish": {
+    "behavior": {
+      "cleanSource": {
+        "package.json": {
+          "type": "json",
+          "remove": [
+            "repository",
+            "cleanPublish"
+          ],
+          "add": {
+            "homepage": "https://keeex.me/oss",
+            "scripts": {
+              "build": "tslib build",
+              "check": "tslib check",
+              "clean": "tslib clean",
+              "prepack": "npm run clean && npm run build",
+              "test": "tslib test"
+            }
+          }
+        },
+        "README.md": {
+          "type": "text",
+          "remove": [
+            "https://devtools.keeex.me",
+            "https://docs.keeex.me"
+          ]
+        },
+        "sonar-project.properties": "remove"
+      },
+      "cleanPrepack": {
+        "package.json": [
+          {
+            "type": "json",
+            "add": {
+              "homepage": "https://keeex.me/oss"
+            }
+          }
+        ],
+        "README.md": {
+          "type": "text",
+          "remove": [
+            "https://devtools.keeex.me",
+            "https://docs.keeex.me"
+          ]
+        },
+        "sonar-project.properties": "remove"
+      },
+      "cleanPublish": {
+        "package.json": [
+          {
+            "type": "json",
+            "package": true,
+            "remove": [
+              "repository"
+            ]
+          }
+        ]
+      }
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/KeeeX/jsSha.git"
@@ -54,13 +114,13 @@
   "devDependencies": {
     "@babel/cli": "^7.24.8",
     "@babel/preset-env": "^7.24.8",
+    "@keeex/clean-publish": "^1.1.1",
     "@keeex/eslint-config": "^1.12.5",
     "@keeex/tslib": "^1.21.3",
     "@swc/core": "^1.7.0",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/rewire": "^2.5.28",
-    "@types/sinon": "^10.0.16",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
     "babel-plugin-import-redirect": "^1.1.1",
@@ -74,14 +134,22 @@
     "eslint-plugin-tsdoc": "^0.3.0",
     "knip": "^5.26.0",
     "mocha": "^10.2.0",
-    "rewire": "^6.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.5.3"
   },
+  "files": [
+    "lib",
+    "web"
+  ],
   "scripts": {
     "build": "tslib build",
+    "check": "tslib check",
     "clean": "tslib clean",
+    "postpack": "clean-publish restore",
     "prepack": "npm run clean && npm run build",
+    "prepublishOnly": "publish_check.sh",
+    "rawtest": "tslib rawtest --inspect --timeout 150000000",
+    "sonar": "npm run clean && tslib reporting && sonar-scanner -Dsonar.projectVersion=$(jq .version package.json)",
     "test": "tslib test"
   },
   "tslib": {
