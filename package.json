@@ -146,7 +146,7 @@
     "check": "tslib check",
     "clean": "tslib clean",
     "postpack": "clean-publish restore",
-    "prepack": "npm run clean && npm run build",
+    "prepack": "npm run clean && npm run build && clean-publish cleanPublish",
     "prepublishOnly": "publish_check.sh",
     "rawtest": "tslib rawtest --inspect --timeout 150000000",
     "sonar": "npm run clean && tslib reporting && sonar-scanner -Dsonar.projectVersion=$(jq .version package.json)",
