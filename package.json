@@ -47,8 +47,7 @@
             "https://devtools.keeex.me",
             "https://docs.keeex.me"
           ]
-        },
-        "sonar-project.properties": "remove"
+        }
       },
       "cleanPublish": {
         "package.json": [
