@@ -38,15 +38,16 @@ npm install @keeex/jssha
 To use the module, first require it using:
 
 ```javascript
-import jsSHA from "@keeex/jssha";
+import JsSha from "@keeex/jssha";
 /* The limited variant files are also exported (sha1, sha256, sha512, and sha3)
  * and are accessible as \`@keeex/jssha/lib/sha1.ts\`, \`@keeex/jssha/lib/sha256.ts\`…
-import {jsSHA1} from "@keeex/jssha/lib/sha1.js";
+ */
+import {JsSha1} from "@keeex/jssha/lib/sha1.js";
 ```
 
 ### Hashing
 
-Instantiate a new `jsSHA` object with the desired hash variant, input format,
+Instantiate a new `JsSha` object with the desired hash variant, input format,
 and options as parameters. The hash variant can be one of SHA-1, SHA-224,
 SHA3-224, SHA-256, SHA3-256, SHA-384, SHA3-384, SHA-512, SHA3-512, SHAKE128, or
 SHAKE256. The input format can be one of HEX, TEXT, B64, BYTES, ARRAYBUFFER, or
@@ -56,7 +57,7 @@ output type as a parameter (B64, HEX, BYTES, ARRAYBUFFER, or UINT8ARRAY).
 Example to calculate the SHA-512 of "This is a test":
 
 ```javascript
-const shaObj = new jsSHA("SHA-512", "TEXT", { encoding: "UTF8" });
+const shaObj = new JsSha("SHA-512", "TEXT", { encoding: "UTF8" });
 /* .update() can be chained */
 shaObj.update("This is").update(" a ");
 shaObj.update("test");
@@ -88,7 +89,7 @@ calling the `getHash` function with the output type as its argument. Example to
 calculate the SHA-512 HMAC of the string "This is a test" with the key "abc":
 
 ```javascript
-const shaObj = new jsSHA("SHA-512", "TEXT", {
+const shaObj = new JsSha("SHA-512", "TEXT", {
   hmacKey: { value: "abc", format: "TEXT" },
 });
 shaObj.update("This is a ");
@@ -100,7 +101,7 @@ Note: You cannot specify `numRounds` with HMAC.
 
 ### cSHAKE
 
-Instantiate a new `jsSHA` object similiar to HMAC but first argument being
+Instantiate a new `JsSha` object similiar to HMAC but first argument being
 either "CSHAKE128" or "CSHAKE256" and the third argument in the form of
 `{ "customization"?: { "value": VALUE, "format": FORMAT }, "funcName"?: { "value": VALUE, "format": FORMAT } }`.
 FORMAT takes the same values as the input format from hashing and the VALUE is
@@ -113,7 +114,7 @@ with the customization string "My Tagged Application" and an output size of
 256-bits.
 
 ```javascript
-const shaObj = new jsSHA("CSHAKE128", "TEXT", {
+const shaObj = new JsSha("CSHAKE128", "TEXT", {
   customization: { value: "My Tagged Application", format: "TEXT" },
 });
 shaObj.update("This is a ");
@@ -128,7 +129,7 @@ is the desired output length of the cSHAKE algorithm in a multiple of 8 bits.
 
 ### KMAC
 
-Instantiate a new `jsSHA` object similiar to cSHAKE but first argument being
+Instantiate a new `JsSha` object similiar to cSHAKE but first argument being
 either "KMAC128" or "KMAC256" and the third argument in the form of
 `{ "customization"?: { "value": VALUE, "format": FORMAT }, "kmacKey?: { "value": VALUE, "format": FORMAT } }`.
 FORMAT takes the same values as the input format from hashing and the VALUE is
@@ -141,7 +142,7 @@ test" with the customization string "My Tagged Application", key "abc", and an
 output size of 256-bits.
 
 ```javascript
-const shaObj = new jsSHA("KMAC128", "TEXT", {
+const shaObj = new JsSha("KMAC128", "TEXT", {
   customization: { value: "My Tagged Application", format: "TEXT" },
   kmacKey: { value: "abc", format: "TEXT" },
 });
@@ -157,7 +158,6 @@ is the desired output length of the KMAC algorithm in a multiple of 8 bits.
 
 ## Contact Info
 
-The original project's website is located at https://caligatio.github.io/jsSHA/
+The original project's website is located at [jsSHA](https://caligatio.github.io/jsSHA/)
 
 For details about this fork, contact KeeeX.
-
